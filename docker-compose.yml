@@ -29,7 +29,6 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     command: >
       sh -c "
-        echo 'Database URL: $${DATABASE_URL}' &&
         python database/init_db.py &&
         python run.py
       "
