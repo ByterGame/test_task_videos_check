@@ -19,12 +19,14 @@ async def query_handler(message: Message):
         logger.warning("Failed to generate SQL query")
         await message.answer('-1')
         return
-    
+    # logger.info(f"SQL {sql_query}")
     result = await db_manager.execute_sql(sql_query)
 
     if result is None:
         logger.warning("Failed execute query")
         await message.answer('-1')
         return
-    
-    await message.answer(text=str(result))
+    try:
+        await message.answer(text=str(int(result)))
+    except:
+        await message.answer(str(result))
