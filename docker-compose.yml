@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: db_test_task
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bot_db}
+      POSTGRES_USER: ${POSTGRES_USER:-bot_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bot_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-bot_user}", "-d", "${POSTGRES_DB:-bot_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  bot:
+    build: .
+    container_name: telegram_bot
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    command: >
+      sh -c "
+        echo 'Database URL: $${DATABASE_URL}' &&
+        python database/init_db.py &&
+        python run.py
+      "
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

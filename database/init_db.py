@@ -1,0 +1,1 @@
+print("DB_INIT_LOG")
