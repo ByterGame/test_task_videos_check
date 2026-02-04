@@ -4,10 +4,13 @@ import asyncio
 import asyncpg
 import os
 import pathlib
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 async def init_database():
-    print("init_database")
+    logger.info("init_database")
 
     conn = None
 
@@ -20,7 +23,7 @@ async def init_database():
             port=5432
         )
 
-        print("connect success")
+        logger.info("connect success")
 
         tables = await conn.fetch("""
             SELECT table_name
@@ -29,22 +32,22 @@ async def init_database():
         """)
 
         if tables:
-            print(f"Found tables: {[t['table_name'] for t in tables]}")
+            logger.info(f"Found tables: {[t['table_name'] for t in tables]}")
             return
         
         await create_tables(conn)
-        print("tables created")
+        logger.info("tables created")
         await load_data(conn)
 
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
         raise
     finally:
         if conn:
             await conn.close()
 
 async def create_tables(conn):
-    print("Creating tables")
+    logger.info("Creating tables")
 
     await conn.execute("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
     
@@ -88,7 +91,7 @@ async def create_tables(conn):
     """)
 
 async def load_data(conn):
-    print("loading data")
+    logger.inof("loading data")
     current_dir = pathlib.Path(__file__).parent
     fixtures_path = current_dir / "fixtures" / "videos.json"
     with open(fixtures_path, "r") as f:
@@ -136,6 +139,6 @@ async def load_data(conn):
                     datetime.fromisoformat(snapshot['created_at'].replace('Z', '+00:00')),
                     datetime.fromisoformat(snapshot['updated_at'].replace('Z', '+00:00'))
                 )
-    print("data loaded")
+    logger.info("data loaded")
 
 asyncio.run(init_database())
