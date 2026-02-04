@@ -91,7 +91,7 @@ async def create_tables(conn):
     """)
 
 async def load_data(conn):
-    logger.inof("loading data")
+    logger.info("loading data")
     current_dir = pathlib.Path(__file__).parent
     fixtures_path = current_dir / "fixtures" / "videos.json"
     with open(fixtures_path, "r") as f:
