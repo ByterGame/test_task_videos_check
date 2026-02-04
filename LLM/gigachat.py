@@ -41,7 +41,6 @@ class gigachat_class:
                 
                 response = self.client.chat(chat)
                 reply = response.choices[0].message.content.strip()
-                logger.info(f"REPLY {reply}")
                 sql = self._extract_sql(reply)
                 
                 if sql:

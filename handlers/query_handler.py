@@ -13,7 +13,6 @@ async def query_handler(message: Message):
     for _ in range(5):
         sql_query = await gigachat_instance.ask_question(message.text)
         if sql_query:
-            logger.info(f"SQL_QUERY {sql_query}")
             break
     
     if not sql_query:
